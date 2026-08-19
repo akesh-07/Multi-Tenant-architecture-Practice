@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.api.student_controller import router as student_router
@@ -6,8 +6,36 @@ from app.utils.exception_handlers import add_exception_handlers
 from app.core.security import create_access_token
 from app.database.connection import get_db
 from app.models.tenant_model import TenantDB
+from app.core.logging_config import setup_logging
+import logging
+import time
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    setup_logging()
+    logger.info("Application startup")
+    yield
+    logger.info("Application shutdown")
+
+app = FastAPI(lifespan=lifespan)
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    logger.info(f"{request.method} {request.url.path}")
+    
+    try:
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        logger.info(f"Request completed | status={response.status_code} | time={process_time:.3f}s")
+        return response
+    except Exception as e:
+        process_time = time.time() - start_time
+        logger.exception(f"Request failed | time={process_time:.3f}s")
+        raise e
 
 add_exception_handlers(app)
 app.include_router(student_router)

@@ -5,7 +5,9 @@ from app.schemas.student_schema import Student
 from app.orchestration.student_orchestrator import StudentOrchestrator
 from app.utils.exceptions import StudentNotFoundError
 from app.dependencies.tenant import get_current_tenant
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 orchestrator = StudentOrchestrator()
 
@@ -23,6 +25,7 @@ def create_student(student: Student, db: Session = Depends(get_db), tenant_id: i
     - The created student object.
     - HTTP status code 200 on success.
     """
+    logger.info(f"tenant={tenant_id} | Creating new student")
     return orchestrator.create_student(db, tenant_id, student)
 
 @router.get("/students")
@@ -39,6 +42,7 @@ def get_students(db: Session = Depends(get_db), tenant_id: int = Depends(get_cur
     - A list of all students.
     - HTTP status code 200 on success.
     """
+    logger.info(f"tenant={tenant_id} | Fetching all students")
     return orchestrator.get_all_students(db, tenant_id)
 
 @router.get("/students/{sid}")
@@ -56,8 +60,10 @@ def get_student(sid: int, db: Session = Depends(get_db), tenant_id: int = Depend
     - HTTP status code 200 on success.
     - HTTP status code 404 if the student does not exist.
     """
+    logger.info(f"tenant={tenant_id} | Fetching student sid={sid}")
     student = orchestrator.get_student(db, tenant_id, sid)
     if not student:
+        logger.warning(f"tenant={tenant_id} | Student sid={sid} not found")
         raise StudentNotFoundError()
     return student
 
@@ -77,8 +83,10 @@ def update_student(sid: int, student: Student, db: Session = Depends(get_db), te
     - HTTP status code 200 on success.
     - HTTP status code 404 if the student does not exist.
     """
+    logger.info(f"tenant={tenant_id} | Updating student sid={sid}")
     updated_student = orchestrator.update_student(db, tenant_id, sid, student)
     if not updated_student:
+        logger.warning(f"tenant={tenant_id} | Student sid={sid} not found for update")
         raise StudentNotFoundError()
     return updated_student
 
@@ -97,7 +105,9 @@ def delete_student(sid: int, db: Session = Depends(get_db), tenant_id: int = Dep
     - HTTP status code 200 on success.
     - HTTP status code 404 if the student does not exist.
     """
+    logger.info(f"tenant={tenant_id} | Deleting student sid={sid}")
     success = orchestrator.delete_student(db, tenant_id, sid)
     if not success:
+        logger.warning(f"tenant={tenant_id} | Student sid={sid} not found for deletion")
         raise StudentNotFoundError()
     return {"message": "Student deleted"}
