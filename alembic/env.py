@@ -21,6 +21,7 @@ import sys
 sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
 from app.database.base import Base
 from app.models.student_model import StudentDB
+from app.models.tenant_model import TenantDB
 
 target_metadata = Base.metadata
 

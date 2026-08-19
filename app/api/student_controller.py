@@ -4,12 +4,13 @@ from app.database.connection import get_db
 from app.schemas.student_schema import Student
 from app.orchestration.student_orchestrator import StudentOrchestrator
 from app.utils.exceptions import StudentNotFoundError
+from app.dependencies.tenant import get_current_tenant
 
 router = APIRouter()
 orchestrator = StudentOrchestrator()
 
 @router.post("/students")
-def create_student(student: Student, db: Session = Depends(get_db)):
+def create_student(student: Student, db: Session = Depends(get_db), tenant_id: int = Depends(get_current_tenant)):
     """
     Description
 
@@ -22,10 +23,10 @@ def create_student(student: Student, db: Session = Depends(get_db)):
     - The created student object.
     - HTTP status code 200 on success.
     """
-    return orchestrator.create_student(db, student)
+    return orchestrator.create_student(db, tenant_id, student)
 
 @router.get("/students")
-def get_students(db: Session = Depends(get_db)):
+def get_students(db: Session = Depends(get_db), tenant_id: int = Depends(get_current_tenant)):
     """
     Description
 
@@ -38,10 +39,10 @@ def get_students(db: Session = Depends(get_db)):
     - A list of all students.
     - HTTP status code 200 on success.
     """
-    return orchestrator.get_all_students(db)
+    return orchestrator.get_all_students(db, tenant_id)
 
 @router.get("/students/{sid}")
-def get_student(sid: int, db: Session = Depends(get_db)):
+def get_student(sid: int, db: Session = Depends(get_db), tenant_id: int = Depends(get_current_tenant)):
     """
     Description
 
@@ -55,13 +56,13 @@ def get_student(sid: int, db: Session = Depends(get_db)):
     - HTTP status code 200 on success.
     - HTTP status code 404 if the student does not exist.
     """
-    student = orchestrator.get_student(db, sid)
+    student = orchestrator.get_student(db, tenant_id, sid)
     if not student:
         raise StudentNotFoundError()
     return student
 
 @router.put("/students/{sid}")
-def update_student(sid: int, student: Student, db: Session = Depends(get_db)):
+def update_student(sid: int, student: Student, db: Session = Depends(get_db), tenant_id: int = Depends(get_current_tenant)):
     """
     Description
 
@@ -76,13 +77,13 @@ def update_student(sid: int, student: Student, db: Session = Depends(get_db)):
     - HTTP status code 200 on success.
     - HTTP status code 404 if the student does not exist.
     """
-    updated_student = orchestrator.update_student(db, sid, student)
+    updated_student = orchestrator.update_student(db, tenant_id, sid, student)
     if not updated_student:
         raise StudentNotFoundError()
     return updated_student
 
 @router.delete("/students/{sid}")
-def delete_student(sid: int, db: Session = Depends(get_db)):
+def delete_student(sid: int, db: Session = Depends(get_db), tenant_id: int = Depends(get_current_tenant)):
     """
     Description
 
@@ -96,7 +97,7 @@ def delete_student(sid: int, db: Session = Depends(get_db)):
     - HTTP status code 200 on success.
     - HTTP status code 404 if the student does not exist.
     """
-    success = orchestrator.delete_student(db, sid)
+    success = orchestrator.delete_student(db, tenant_id, sid)
     if not success:
         raise StudentNotFoundError()
     return {"message": "Student deleted"}
