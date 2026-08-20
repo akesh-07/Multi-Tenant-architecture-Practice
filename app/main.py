@@ -60,7 +60,13 @@ def login_for_access_token(
     if not tenant:
         new_tenant = TenantDB(id=tenant_id, name=f"Mock Tenant {tenant_id}")
         db.add(new_tenant)
-        db.commit()
+        try:
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            from app.utils.exceptions import DatabaseError
+            logger.error(f"Database error creating mock tenant: {e}")
+            raise DatabaseError("Failed to create mock tenant due to a database error")
 
     access_token = create_access_token(data={"sub": str(tenant_id), "tenant_id": tenant_id})
     return {"access_token": access_token, "token_type": "bearer"}
