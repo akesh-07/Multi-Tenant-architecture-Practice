@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from app.core.security import decode_access_token
 import jwt
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/token")
 
 def get_current_tenant(token: str = Depends(oauth2_scheme)) -> int:
     credentials_exception = HTTPException(

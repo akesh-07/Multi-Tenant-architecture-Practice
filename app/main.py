@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.api.student_controller import router as student_router
+from app.api.v1.student_controller import router as student_router
 from app.utils.exception_handlers import add_exception_handlers
 from app.core.security import create_access_token
 from app.database.connection import get_db
@@ -38,9 +38,9 @@ async def log_requests(request: Request, call_next):
         raise e
 
 add_exception_handlers(app)
-app.include_router(student_router)
+app.include_router(student_router, prefix="/api/v1")
 
-@app.post("/token")
+@app.post("/api/v1/token")
 def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
