@@ -3,6 +3,7 @@ from app.database.base import Base
 from app.models.tenant_model import TenantDB
 
 class StudentDB(Base):
+    # Represents the students table in the database
     __tablename__ = "students"
 
     id = Column(Integer, primary_key=True, index=True)

@@ -6,6 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class StudentOrchestrator:
+    # Orchestrates multiple services or complex business flows
     def __init__(self):
         self.service = StudentService()
 

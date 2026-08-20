@@ -6,6 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class StudentService:
+    # Contains the core business logic and validations for students
     def __init__(self):
         self.repository = StudentRepository()
 

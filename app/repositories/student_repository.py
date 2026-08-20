@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 class StudentRepository:
     def get_all(self, db: Session, tenant_id: int):
+        # Fetch all students strictly belonging to the given tenant
         logger.debug(f"tenant={tenant_id} | Executing SELECT for all students")
         return db.query(StudentDB).filter(StudentDB.tenant_id == tenant_id).all()
 

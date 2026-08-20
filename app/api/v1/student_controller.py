@@ -8,6 +8,7 @@ from app.dependencies.tenant import get_current_tenant
 import logging
 
 logger = logging.getLogger(__name__)
+# Router handles HTTP routing while delegating business logic to the orchestrator
 router = APIRouter()
 orchestrator = StudentOrchestrator()
 

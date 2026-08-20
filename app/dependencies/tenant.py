@@ -6,6 +6,7 @@ import jwt
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/token")
 
 def get_current_tenant(token: str = Depends(oauth2_scheme)) -> int:
+    # Extracts and validates the tenant ID from the current user's JWT token
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

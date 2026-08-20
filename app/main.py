@@ -24,6 +24,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
+    # Logs every incoming request and its processing time
     start_time = time.time()
     logger.info(f"{request.method} {request.url.path}")
     
